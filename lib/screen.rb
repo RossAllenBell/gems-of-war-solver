@@ -120,7 +120,7 @@ class Screen
   def gem_at(x:, y:)
     GridGem.from_coords(
       rmagick_image: self.rmagick_image,
-      coords: pixel_coords_for_gem_at(x: x, y: y)
+      coords: pixel_coords_for_gem_at(x: x, y: y),
     )
   end
   memoize :gem_at
@@ -131,10 +131,16 @@ class Screen
     start_y = gem_grid_top_y + (y * gem_offset)
     end_y = start_y + gem_offset
 
+    valid_radius = (gem_offset / 2) - 10
+    center = [start_x + (gem_offset / 2), start_y + (gem_offset / 2)]
+
     coords = []
     (start_x..end_x).each do |x|
       (start_y..end_y).each do |y|
-        coords << [x,y]
+        distance_from_center = Math.sqrt(((x - center[0]) ** 2) + ((y - center[1]) ** 2))
+        if distance_from_center <= valid_radius
+          coords << [x,y]
+        end
       end
     end
 
