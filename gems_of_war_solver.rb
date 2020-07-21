@@ -2,7 +2,7 @@ require 'RMagick'
 require 'memoist'
 require 'byebug'
 
-Dir[__dir__ + '/lib/*'].each &method(:require)
+Dir[__dir__ + '/lib/**/*.rb'].each &method(:require)
 
 screenshot_filename = ARGV.first || fail('Expected screenshot filename as arg')
 

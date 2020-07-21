@@ -1,5 +1,7 @@
-  class Screen
-    extend Memoist
+class Screen
+  extend Memoist
+
+  ImageMagickFuzz = 0.025
 
   GemGridDarkGray = Magick::Pixel.new(
     78 / 255.0 * Magick::QuantumRange,
@@ -18,8 +20,8 @@
   GridLength = 8
 
   def self.is_pixel_gem_grid_gray?(rmagick_pixel:)
-    return true if rmagick_pixel.fcmp(GemGridLightGray, Magick::QuantumRange * 0.05)
-    return true if rmagick_pixel.fcmp(GemGridDarkGray, Magick::QuantumRange * 0.05)
+    return true if rmagick_pixel.fcmp(GemGridLightGray, Magick::QuantumRange * Screen::ImageMagickFuzz)
+    return true if rmagick_pixel.fcmp(GemGridDarkGray, Magick::QuantumRange * Screen::ImageMagickFuzz)
     return false
   end
 
@@ -37,7 +39,7 @@
       coords = (0..self.rmagick_image.columns - 1).map do |x|
         [x, row]
       end
-      coords = coords.sample(coords.length * 0.1)
+      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
       if self.are_coords_gem_grid_gray?(coords: coords)
         break
@@ -55,7 +57,7 @@
       coords = (0..self.rmagick_image.columns - 1).map do |x|
         [x, row]
       end
-      coords = coords.sample(coords.length * 0.1)
+      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
       if self.are_coords_gem_grid_gray?(coords: coords)
         break
@@ -73,7 +75,7 @@
       coords = (0..self.rmagick_image.rows - 1).map do |y|
         [col, y]
       end
-      coords = coords.sample(coords.length * 0.1)
+      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
       if self.are_coords_gem_grid_gray?(coords: coords)
         break
@@ -91,7 +93,7 @@
       coords = (0..self.rmagick_image.rows - 1).map do |y|
         [col, y]
       end
-      coords = coords.sample(coords.length * 0.1)
+      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
       if self.are_coords_gem_grid_gray?(coords: coords)
         break
