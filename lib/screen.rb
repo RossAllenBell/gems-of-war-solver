@@ -118,7 +118,7 @@ class Screen
   end
 
   def gem_at(x:, y:)
-    GridGem.from_coords(
+    ScreenGem.from_coords(
       rmagick_image: self.rmagick_image,
       coords: pixel_coords_for_gem_at(x: x, y: y),
     )

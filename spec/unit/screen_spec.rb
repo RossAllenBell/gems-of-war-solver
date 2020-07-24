@@ -30,35 +30,35 @@ describe Screen do
     end
 
     it 'can identify a gem as blue' do
-      expect(screen.gem_at(x: 0, y: 0).color).to eql(GridGem::Colors::Blue)
+      expect(screen.gem_at(x: 0, y: 0).color).to eql(ScreenGem::Colors::Blue)
     end
 
     it 'can identify a gem as brown' do
-      expect(screen.gem_at(x: 1, y: 1).color).to eql(GridGem::Colors::Brown)
+      expect(screen.gem_at(x: 1, y: 1).color).to eql(ScreenGem::Colors::Brown)
     end
 
     it 'can identify a gem as green' do
-      expect(screen.gem_at(x: 0, y: 2).color).to eql(GridGem::Colors::Green)
+      expect(screen.gem_at(x: 0, y: 2).color).to eql(ScreenGem::Colors::Green)
     end
 
     it 'can identify a gem as purple' do
-      expect(screen.gem_at(x: 2, y: 0).color).to eql(GridGem::Colors::Purple)
+      expect(screen.gem_at(x: 2, y: 0).color).to eql(ScreenGem::Colors::Purple)
     end
 
     it 'can identify a gem as red' do
-      expect(screen.gem_at(x: 3, y: 0).color).to eql(GridGem::Colors::Red)
+      expect(screen.gem_at(x: 3, y: 0).color).to eql(ScreenGem::Colors::Red)
     end
 
     it 'can identify a gem as yellow' do
-      expect(screen.gem_at(x: 1, y: 2).color).to eql(GridGem::Colors::Yellow)
+      expect(screen.gem_at(x: 1, y: 2).color).to eql(ScreenGem::Colors::Yellow)
     end
 
     it 'can identify a gem as skull' do
-      expect(screen.gem_at(x: 0, y: 1).color).to eql(GridGem::Colors::Skull)
+      expect(screen.gem_at(x: 0, y: 1).color).to eql(ScreenGem::Colors::Skull)
     end
 
     it 'can identify a gem as exploding skull' do
-      expect(screen.gem_at(x: 4, y: 2).color).to eql(GridGem::Colors::ExplodingSkull)
+      expect(screen.gem_at(x: 4, y: 2).color).to eql(ScreenGem::Colors::ExplodingSkull)
     end
 
   end
@@ -68,7 +68,7 @@ describe Screen do
     let(:screenshot_filename){'screenshots/002.png'}
 
     it 'can identify a gem as an unmatchable space' do
-      expect(screen.gem_at(x: 0, y: 3).color).to eql(GridGem::Colors::Unmatchable)
+      expect(screen.gem_at(x: 0, y: 3).color).to eql(ScreenGem::Colors::Unmatchable)
     end
 
   end
