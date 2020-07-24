@@ -37,7 +37,7 @@ class Screen
     row = 0
     while row < self.rmagick_image.rows
       coords = (0..self.rmagick_image.columns - 1).map do |x|
-        [x, row]
+        Coordinate.new(x: x, y: row)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
@@ -55,7 +55,7 @@ class Screen
     row = self.rmagick_image.rows - 1
     while row >= 0
       coords = (0..self.rmagick_image.columns - 1).map do |x|
-        [x, row]
+        Coordinate.new(x: x, y: row)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
@@ -73,7 +73,7 @@ class Screen
     col = 0
     while col < self.rmagick_image.columns
       coords = (0..self.rmagick_image.rows - 1).map do |y|
-        [col, y]
+        Coordinate.new(x: col, y: y)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
@@ -91,7 +91,7 @@ class Screen
     col = self.rmagick_image.columns - 1
     while col >= 0
       coords = (0..self.rmagick_image.rows - 1).map do |y|
-        [col, y]
+        Coordinate.new(x: col, y: y)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
@@ -107,7 +107,7 @@ class Screen
 
   def are_coords_gem_grid_gray?(coords:)
     results = coords.map do |coord|
-      if Screen.is_pixel_gem_grid_gray?(rmagick_pixel: self.rmagick_image.pixel_color(coord.first, coord.last))
+      if Screen.is_pixel_gem_grid_gray?(rmagick_pixel: self.rmagick_image.pixel_color(coord.x, coord.y))
         1
       else
         0
@@ -132,14 +132,14 @@ class Screen
     end_y = start_y + gem_offset
 
     valid_radius = (gem_offset / 2) - 10
-    center = [start_x + (gem_offset / 2), start_y + (gem_offset / 2)]
+    center = Coordinate.new(x: start_x + (gem_offset / 2), y: start_y + (gem_offset / 2))
 
     coords = []
     (start_x..end_x).each do |x|
       (start_y..end_y).each do |y|
-        distance_from_center = Math.sqrt(((x - center[0]) ** 2) + ((y - center[1]) ** 2))
-        if distance_from_center <= valid_radius
-          coords << [x,y]
+        coord = Coordinate.new(x: x, y: y)
+        if center.distance_from(coordinate: coord) <= valid_radius
+          coords << coord
         end
       end
     end

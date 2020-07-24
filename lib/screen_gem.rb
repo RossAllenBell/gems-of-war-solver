@@ -22,22 +22,19 @@ class ScreenGem
         image = Magick::ImageList.new("lib/gem_images/#{color}.png")
         total_pixels = image.columns + image.rows
         valid_radius = [image.columns / 2, image.rows / 2].min - 10
-        center = [image.columns / 2, image.rows / 2]
+        center = Coordinate.new(x: image.columns / 2, y: image.rows / 2)
 
         pixel_coords = (0..image.columns - 1).map do |col|
           (0..image.rows - 1).map do |row|
-            [col,row]
+            Coordinate.new(x: col, y: row)
           end
         end.flatten(1).select.with_index{|coord, index| index % 10 == 0}
 
         sampled_pixels = []
 
         pixel_coords.each do |pixel_coord|
-          x = pixel_coord.first
-          y = pixel_coord.last
-          distance_from_center = Math.sqrt(((x - center[0]) ** 2) + ((y - center[1]) ** 2))
-          if distance_from_center <= valid_radius
-            sampled_pixel = image.pixel_color(x, y)
+          if center.distance_from(coordinate: pixel_coord) <= valid_radius
+            sampled_pixel = image.pixel_color(pixel_coord.x, pixel_coord.y)
 
             if sampled_pixel.alpha > 0
 
@@ -82,8 +79,8 @@ class ScreenGem
 
   def self.from_coords(rmagick_image:, coords:)
     match_counts = {}
-    coords.sample(coords.length * 0.1).each do |coord|
-      pixel = rmagick_image.pixel_color(coord.first, coord.last)
+    coords.select.with_index{|coord, index| index % 10 == 0}.each do |coord|
+      pixel = rmagick_image.pixel_color(coord.x, coord.y)
       ScreenGem::Colors::All.each do |color|
         any_match = ScreenGem.colors_to_pixel_sets[color].any? do |color_pixel|
           pixel.fcmp(color_pixel, Magick::QuantumRange * Screen::ImageMagickFuzz)
@@ -95,7 +92,6 @@ class ScreenGem
     end
 
     color = match_counts.to_a.sort_by(&:last).last.first
-
 
     fail('could not detect color') if color.nil?
 
