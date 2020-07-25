@@ -71,6 +71,8 @@ describe Board do
 
     it 'reports if the move leaves the oppoent with an extra turn match'
 
+    it 'reports if the move leaves the board to be potentially jumbled'
+
   end
 
   describe :resolve! do
@@ -194,15 +196,71 @@ describe Board do
       expect(board.grid.flatten.map(&:class).uniq - [UnknownGem]).to eql([UnmatchableGem])
     end
 
-    it 'tracks mana earned'
+    it 'tracks mana earned' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.active?).to eql(true)
+      expect(board_resolution.mana_earned[BlueGem]).to eql(3)
+      expect(board_resolution.mana_earned[BrownGem]).to eql(0)
+    end
+
+    it 'tracks mana earned from exploding skull'
 
     it 'tracks if an extra turn was earned'
+
+    it 'tracks skull damage done'
+
+    it 'can differentiate between skull damage and an attack'
 
   end
 
   describe :test_move do
 
-    it 'knows if the move was valid'
+    it 'knows if the move was valid' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+
+      board_resolution = board.test_move(
+        swap_a: Coordinate.new(x: 0, y: 0),
+        swap_b: Coordinate.new(x: -1, y: 0),
+      )
+
+      expect(board_resolution.active?).to eql(false)
+    end
+
+    it 'knows if the move was valid' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+
+      board_resolution = board.test_move(
+        swap_a: Coordinate.new(x: 0, y: 0),
+        swap_b: Coordinate.new(x: 0, y: 1),
+      )
+
+      expect(board_resolution.active?).to eql(false)
+    end
+
+    it 'knows if the move was valid' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+
+      board_resolution = board.test_move(
+        swap_a: Coordinate.new(x: 0, y: 2),
+        swap_b: Coordinate.new(x: 0, y: 3),
+      )
+
+      expect(board_resolution.active?).to eql(true)
+    end
 
   end
 

@@ -26,11 +26,12 @@ class Board
 
     self.grid.each_with_index do |column_gems, x|
       column_gems.each_with_index do |board_gem, y|
-        if board_gem.moveable?
+        if board_gem.moveable? && board_gem.matchable?
           swap_a = Coordinate.new(x: x, y: y)
 
           swap_a.cardinal_steps.each do |potential_swap|
-            if self.test_move(swap_a: swap_a, swap_b: potential_swap)
+            board_resolution = self.test_move(swap_a: swap_a, swap_b: potential_swap)
+            if board_resolution.active?
               collected_moves << Move.new(
                 swap_a: swap_a,
                 swap_b: potential_swap,
@@ -47,11 +48,11 @@ class Board
   end
 
   def test_move(swap_a:, swap_b:)
-    return false unless is_valid_coordinate?(coordinate: swap_a)
-    return false unless is_valid_coordinate?(coordinate: swap_b)
+    return BoardResolution.new unless is_valid_coordinate?(coordinate: swap_a)
+    return BoardResolution.new unless is_valid_coordinate?(coordinate: swap_b)
 
     test_board = self.dup
-    fail('unresolved board') if test_board.resolve!
+    fail('unresolved board') if test_board.resolve!.active?
     temp = test_board.grid[swap_a.x][swap_a.y]
     test_board.grid[swap_a.x][swap_a.y] = test_board.grid[swap_b.x][swap_b.y]
     test_board.grid[swap_b.x][swap_b.y] = temp
@@ -59,6 +60,7 @@ class Board
   end
 
   def resolve!
+    board_resolution = BoardResolution.new
     gems_cleared = false
     gems_cleared_this_step = true
 
@@ -78,7 +80,7 @@ class Board
         end
       end
 
-      gems_cleared ||= matched_coordinates.any?
+      board_resolution.was_active! if matched_coordinates.any?
       gems_cleared_this_step = matched_coordinates.any?
 
       exploding_skull_coords = matched_coordinates.map do |coord|
@@ -99,6 +101,7 @@ class Board
       end
 
       matched_coordinates.each do |coord|
+        board_resolution.add_mana(board_gem: self.grid[coord.x][coord.y])
         self.grid[coord.x][coord.y] = nil
       end
 
@@ -119,9 +122,7 @@ class Board
       end
     end
 
-    return BoardResolution.new(
-      active: gems_cleared,
-    end
+    return board_resolution
   end
 
   def find_matching_threes_from(coordinate:)
