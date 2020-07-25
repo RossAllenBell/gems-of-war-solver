@@ -1,0 +1,1 @@
+RUBYOPT=W0 bundle exec ruby gems_of_war_solver.rb

@@ -4,15 +4,47 @@ require 'byebug'
 
 Dir[__dir__ + '/lib/**/*.rb'].each &method(:require)
 
-screenshot_filename = ARGV.first || fail('Expected screenshot filename as arg')
+game = Game.new
+run_id = Time.now.to_i
 
-image = Magick::ImageList.new(screenshot_filename)
-screen = Screen.new(rmagick_image: image)
+temp_file_name = "gems_of_war_solver.rb.#{run_id}.png"
+saved_windowid = nil
 
-(0..Screen::GridLength - 1).each do |y|
-  (0..Screen::GridLength - 1).each do |x|
-    print screen.gem_at(x: x, y: y).color
-    print ', ' unless x == Screen::GridLength - 1
+input = nil
+while input != 'q'
+  print "windowid#{" (#{saved_windowid})" unless saved_windowid.nil?}, image file, or q: "
+  input = gets.strip
+
+  if input.to_s == input.to_i.to_s
+    `screencapture -o -x -l #{input} /tmp/#{temp_file_name}`
+    file_name = temp_file_name
+  elsif input == 'q'
+    break
+  else
+    file_name = input
   end
-  puts
+
+  begin
+    image = Magick::ImageList.new(file_name)
+  rescue ArgumentError, Magick::ImageMagickError => e
+    puts e.message
+  end
+
+  puts ''
+
+  if !image.nil?
+    screen = Screen.new(rmagick_image: image)
+    game.update(screen: screen)
+
+    puts '' if Game::Debug
+
+    game.print_state
+
+    puts ''
+
+    image.destroy!
+    image = nil
+  end
 end
+
+puts 'Exiting...'

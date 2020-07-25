@@ -104,4 +104,17 @@ class ScreenGem
     self.color = color
   end
 
+  def board_gem
+    return BlueGem.new if self.color == ScreenGem::Colors::Blue
+    return BrownGem.new if self.color == ScreenGem::Colors::Brown
+    return GreenGem.new if self.color == ScreenGem::Colors::Green
+    return PurpleGem.new if self.color == ScreenGem::Colors::Purple
+    return RedGem.new if self.color == ScreenGem::Colors::Red
+    return YellowGem.new if self.color == ScreenGem::Colors::Yellow
+    return SkullGem.new if self.color == ScreenGem::Colors::Skull
+    return ExplodingSkullGem.new if self.color == ScreenGem::Colors::ExplodingSkull
+    return UnmatchableGem.new if self.color == ScreenGem::Colors::Unmatchable
+    fail(self)
+  end
+
 end

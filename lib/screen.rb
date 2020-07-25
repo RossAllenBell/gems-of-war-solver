@@ -34,9 +34,11 @@ class Screen
   end
 
   def gem_grid_top_y
+    print 'gem_grid_top_y: ' if Game::Debug
+
     row = 0
     while row < self.rmagick_image.rows
-      coords = (0..self.rmagick_image.columns - 1).map do |x|
+      coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
         Coordinate.new(x: x, y: row)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
@@ -47,14 +49,19 @@ class Screen
 
       row += 1
     end
+
+    puts row if Game::Debug
+
     row
   end
   memoize :gem_grid_top_y
 
   def gem_grid_bottom_y
+    print 'gem_grid_bottom_y: ' if Game::Debug
+
     row = self.rmagick_image.rows - 1
     while row >= 0
-      coords = (0..self.rmagick_image.columns - 1).map do |x|
+      coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
         Coordinate.new(x: x, y: row)
       end
       coords = coords.select.with_index{|coord, index| index % 10 == 0}
@@ -65,11 +72,16 @@ class Screen
 
       row -= 1
     end
+
+    puts row if Game::Debug
+
     row
   end
   memoize :gem_grid_bottom_y
 
   def gem_grid_left_x
+    print 'gem_grid_left_x: ' if Game::Debug
+
     col = 0
     while col < self.rmagick_image.columns
       coords = (0..self.rmagick_image.rows - 1).map do |y|
@@ -83,11 +95,16 @@ class Screen
 
       col += 1
     end
+
+    puts col if Game::Debug
+
     col
   end
   memoize :gem_grid_left_x
 
   def gem_grid_right_x
+    print 'gem_grid_right_x: ' if Game::Debug
+
     col = self.rmagick_image.columns - 1
     while col >= 0
       coords = (0..self.rmagick_image.rows - 1).map do |y|
@@ -101,6 +118,9 @@ class Screen
 
       col -= 1
     end
+
+    puts col if Game::Debug
+
     col
   end
   memoize :gem_grid_right_x
@@ -126,13 +146,13 @@ class Screen
   memoize :gem_at
 
   def pixel_coords_for_gem_at(x:, y:)
-    start_x = gem_grid_left_x + (x * gem_offset)
-    end_x = start_x + gem_offset
-    start_y = gem_grid_top_y + (y * gem_offset)
-    end_y = start_y + gem_offset
+    start_x = gem_grid_left_x + (x * gem_offset_x)
+    end_x = start_x + gem_offset_x
+    start_y = gem_grid_top_y + (y * gem_offset_y)
+    end_y = start_y + gem_offset_y
 
-    valid_radius = (gem_offset / 2) - 10
-    center = Coordinate.new(x: start_x + (gem_offset / 2), y: start_y + (gem_offset / 2))
+    valid_radius = (gem_offset_x / 2) - 10
+    center = Coordinate.new(x: start_x + (gem_offset_x / 2), y: start_y + (gem_offset_y / 2))
 
     coords = []
     (start_x..end_x).each do |x|
@@ -148,9 +168,14 @@ class Screen
   end
   memoize :pixel_coords_for_gem_at
 
-  def gem_offset
-    ((self.gem_grid_bottom_y - self.gem_grid_top_y) / 8.0).to_i
+  def gem_offset_x
+    ((self.gem_grid_right_x - self.gem_grid_left_x) / Board::Width.to_f).to_i
   end
-  memoize :gem_offset
+  memoize :gem_offset_x
+
+  def gem_offset_y
+    ((self.gem_grid_bottom_y - self.gem_grid_top_y) / Board::Height.to_f).to_i
+  end
+  memoize :gem_offset_y
 
 end
