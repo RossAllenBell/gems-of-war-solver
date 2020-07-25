@@ -7,5 +7,6 @@ source 'https://rubygems.org' do
   gem 'byebug'
   gem 'rspec'
   gem 'rspec-core'
+  gem 'factory_bot'
 
 end
