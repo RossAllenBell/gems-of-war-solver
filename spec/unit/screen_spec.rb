@@ -26,7 +26,7 @@ describe Screen do
     end
 
     it 'can identify the gem offset' do
-      expect(screen.gem_offset).to eql(118)
+      expect(screen.gem_offset_x).to eql(118)
     end
 
     it 'can identify a gem as blue' do

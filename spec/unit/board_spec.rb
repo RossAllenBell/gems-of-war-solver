@@ -84,7 +84,7 @@ describe Board do
       expect(board.grid.flatten.map(&:class).uniq).to eql([UnmatchableGem])
     end
 
-    it 'can resolve a single match' do
+    it 'tracks when a resolution was active' do
       board.grid[0][0] = BlueGem.new
       board.grid[0][1] = BlueGem.new
       board.grid[0][2] = BlueGem.new
@@ -92,6 +92,15 @@ describe Board do
       board_resolution = board.resolve!
 
       expect(board_resolution.active?).to eql(true)
+    end
+
+    it 'can resolve a single match' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+
+      board_resolution = board.resolve!
+
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -106,7 +115,6 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -121,7 +129,6 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -140,7 +147,6 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -164,7 +170,6 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -185,7 +190,6 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
       expect(board.grid[0][0].class).to eql(UnknownGem)
       expect(board.grid[0][1].class).to eql(UnknownGem)
       expect(board.grid[0][2].class).to eql(UnknownGem)
@@ -203,14 +207,66 @@ describe Board do
 
       board_resolution = board.resolve!
 
-      expect(board_resolution.active?).to eql(true)
-      expect(board_resolution.mana_earned[BlueGem]).to eql(3)
-      expect(board_resolution.mana_earned[BrownGem]).to eql(0)
+      expect(board_resolution.mana(gem_class: BlueGem)).to eql(3)
+      expect(board_resolution.mana(gem_class: BrownGem)).to eql(0)
     end
 
-    it 'tracks mana earned from exploding skull'
+    it 'tracks half mana earned from exploding skull' do
+      board.grid[0][2] = SkullGem.new
+      board.grid[0][3] = ExplodingSkullGem.new
+      board.grid[0][4] = SkullGem.new
+      board.grid[1][3] = BlueGem.new
 
-    it 'tracks if an extra turn was earned'
+      board_resolution = board.resolve!
+
+      expect(board_resolution.mana(gem_class: BlueGem)).to eql(0)
+    end
+
+    it 'tracks mana earned from exploding skull' do
+      board.grid[0][2] = SkullGem.new
+      board.grid[0][3] = ExplodingSkullGem.new
+      board.grid[0][4] = SkullGem.new
+      board.grid[1][3] = BlueGem.new
+      board.grid[1][4] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.mana(gem_class: BlueGem)).to eql(1)
+    end
+
+    it 'tracks mana earned from exploding skull' do
+      board.grid[0][2] = SkullGem.new
+      board.grid[0][3] = SkullGem.new
+      board.grid[0][4] = ExplodingSkullGem.new
+      board.grid[0][5] = BlueGem.new
+      board.grid[1][3] = BlueGem.new
+      board.grid[1][4] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.mana(gem_class: BlueGem)).to eql(1)
+    end
+
+    it 'tracks if an extra turn was earned' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.extra_turn?).to eql(false)
+    end
+
+    it 'tracks if an extra turn was earned' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+      board.grid[0][3] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.extra_turn?).to eql(true)
+    end
 
     it 'tracks skull damage done'
 

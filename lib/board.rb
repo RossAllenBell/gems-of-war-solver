@@ -37,6 +37,7 @@ class Board
                 swap_b: potential_swap,
                 gem_a: self.grid[swap_a.x][swap_a.y],
                 gem_b: self.grid[potential_swap.x][potential_swap.y],
+
               )
             end
           end
@@ -83,19 +84,16 @@ class Board
       board_resolution.was_active! if matched_coordinates.any?
       gems_cleared_this_step = matched_coordinates.any?
 
-      exploding_skull_coords = matched_coordinates.map do |coord|
-        board_gem = self.grid[coord.x][coord.y]
-        coord if board_gem.class == ExplodingSkullGem
-      end.compact
+      exploding_skull_coords = matched_coordinates.select do |coord|
+        self.grid[coord.x][coord.y].class == ExplodingSkullGem
+      end
 
       i = 0
       while i < exploding_skull_coords.count
         coord = exploding_skull_coords[i]
-        exploding_skull_coords += coord.all_eight_steps.map do |other_coord|
-          if self.is_valid_coordinate?(coordinate: other_coord)
-            other_coord if self.grid[other_coord.x][other_coord.y].class == ExplodingSkullGem
-          end
-        end.compact
+        exploding_skull_coords += coord.all_eight_steps.select do |other_coord|
+          self.is_valid_coordinate?(coordinate: other_coord) && self.grid[other_coord.x][other_coord.y].class == ExplodingSkullGem
+        end
         exploding_skull_coords.uniq!
         i += 1
       end
@@ -109,7 +107,8 @@ class Board
         if self.is_valid_coordinate?(coordinate: exploding_skull_coord)
           self.grid[exploding_skull_coord.x][exploding_skull_coord.y] = nil
           exploding_skull_coord.all_eight_steps.each do |other_coord|
-            if self.is_valid_coordinate?(coordinate: other_coord)
+            if self.is_valid_coordinate?(coordinate: other_coord) && !self.grid[other_coord.x][other_coord.y].nil?
+              board_resolution.add_mana(board_gem: self.grid[other_coord.x][other_coord.y], amount: 0.5)
               self.grid[other_coord.x][other_coord.y] = nil
             end
           end

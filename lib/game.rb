@@ -1,6 +1,6 @@
 class Game
 
-  Debug = true
+  Debug = false
 
   attr_accessor(
     :board,
