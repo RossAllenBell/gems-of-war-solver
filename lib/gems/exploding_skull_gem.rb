@@ -8,4 +8,8 @@ class ExplodingSkullGem < BoardGem
     'ES'
   end
 
+  def skull_damage
+    5
+  end
+
 end

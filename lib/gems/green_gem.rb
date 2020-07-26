@@ -4,4 +4,8 @@ class GreenGem < BoardGem
     'Gr'
   end
 
+  def is_mana?
+    return true
+  end
+
 end

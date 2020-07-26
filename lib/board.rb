@@ -37,7 +37,7 @@ class Board
                 swap_b: potential_swap,
                 gem_a: self.grid[swap_a.x][swap_a.y],
                 gem_b: self.grid[potential_swap.x][potential_swap.y],
-
+                board_resolution: board_resolution,
               )
             end
           end
@@ -61,30 +61,33 @@ class Board
   end
 
   def resolve!
-    board_resolution = BoardResolution.new
+    board_resolution = BoardResolution.new(
+      board: self,
+    )
+
     gems_cleared = false
     gems_cleared_this_step = true
 
     while gems_cleared_this_step
-      matched_coordinates = []
+      matched_threes = []
 
       self.grid.each_with_index do |column_gems, x|
         column_gems.each_with_index do |board_gem, y|
           if board_gem.matchable?
             coordinate = Coordinate.new(x: x, y: y)
-            matching_threes = self.find_matching_threes_from(coordinate: coordinate)
+            matching_threes = self.find_matching_threes_from(coordinate: coordinate).sort
             if matching_threes.count >= 3
-              matched_coordinates += matching_threes
-              matched_coordinates.uniq!
+              matched_threes << matching_threes
+              matched_threes.uniq!
             end
           end
         end
       end
 
-      board_resolution.was_active! if matched_coordinates.any?
-      gems_cleared_this_step = matched_coordinates.any?
+      board_resolution.was_active! if matched_threes.any?
+      gems_cleared_this_step = matched_threes.any?
 
-      exploding_skull_coords = matched_coordinates.select do |coord|
+      exploding_skull_coords = matched_threes.flatten.select do |coord|
         self.grid[coord.x][coord.y].class == ExplodingSkullGem
       end
 
@@ -98,9 +101,39 @@ class Board
         i += 1
       end
 
-      matched_coordinates.each do |coord|
-        board_resolution.add_mana(board_gem: self.grid[coord.x][coord.y])
-        self.grid[coord.x][coord.y] = nil
+      clustered_something = true
+      matched_clusters = matched_threes
+      while clustered_something
+        new_clusters = []
+        clustered_something = false
+        matched_clusters.each do |cluster|
+          matching_cluster = new_clusters.detect do |other_cluster|
+            (other_cluster & cluster).any?
+          end
+          if !matching_cluster.nil?
+            cluster.each do |coord|
+              matching_cluster << coord
+            end
+            matching_cluster.uniq!
+            clustered_something = true
+          else
+            new_clusters << cluster
+          end
+        end
+        matched_clusters = new_clusters
+      end
+
+      matched_clusters.each do |cluster|
+        if self.grid[cluster.first.x][cluster.first.y].skull_damage > 0
+          board_resolution.add_attack
+        end
+        cluster.each do |coord|
+          board_resolution.add_mana(board_gem: self.grid[coord.x][coord.y])
+          self.grid[coord.x][coord.y] = nil
+        end
+        if cluster.length > 3
+          board_resolution.extra_turn!
+        end
       end
 
       exploding_skull_coords.each do |exploding_skull_coord|
@@ -109,6 +142,7 @@ class Board
           exploding_skull_coord.all_eight_steps.each do |other_coord|
             if self.is_valid_coordinate?(coordinate: other_coord) && !self.grid[other_coord.x][other_coord.y].nil?
               board_resolution.add_mana(board_gem: self.grid[other_coord.x][other_coord.y], amount: 0.5)
+              board_resolution.add_skull_damage(board_gem: self.grid[other_coord.x][other_coord.y])
               self.grid[other_coord.x][other_coord.y] = nil
             end
           end

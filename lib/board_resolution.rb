@@ -1,15 +1,21 @@
 class BoardResolution
 
   attr_accessor(
+    :board,
     :active,
     :mana_earned,
     :extra_turn,
+    :skull_damage,
+    :attacks,
   )
 
-  def initialize
+  def initialize(board: nil)
+    self.board = board
     self.active = false
     self.mana_earned = Hash.new(0)
     self.extra_turn = false
+    self.skull_damage = 0
+    self.attacks = 0
   end
 
   def was_active!
@@ -21,7 +27,9 @@ class BoardResolution
   end
 
   def add_mana(board_gem:, amount: 1)
-    self.mana_earned[board_gem.class] += amount
+    if board_gem.is_mana?
+      self.mana_earned[board_gem.class] += amount
+    end
   end
 
   def mana(gem_class:)
@@ -34,6 +42,16 @@ class BoardResolution
 
   def extra_turn?
     return self.extra_turn
+  end
+
+  def add_skull_damage(board_gem:)
+    if board_gem.skull_damage > 0
+      self.skull_damage += board_gem.skull_damage
+    end
+  end
+
+  def add_attack
+    self.attacks += 1
   end
 
 end

@@ -4,4 +4,8 @@ class RedGem < BoardGem
     'Re'
   end
 
+  def is_mana?
+    return true
+  end
+
 end

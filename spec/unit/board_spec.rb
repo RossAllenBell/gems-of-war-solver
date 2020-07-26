@@ -67,11 +67,116 @@ describe Board do
       expect{board.moves}.not_to raise_exception
     end
 
-    it 'reports if the move leaves the opponent with a skull match'
+    it 'tracks the resulting mana' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
 
-    it 'reports if the move leaves the oppoent with an extra turn match'
+      moves = board.moves
 
-    it 'reports if the move leaves the board to be potentially jumbled'
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.mana(gem_class: BlueGem)).to eql(3)
+    end
+
+    it 'reports if the move leaves the opponent with a skull match' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+
+      moves = board.moves
+
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.leaves_skull_match?).to eql(false)
+    end
+
+    it 'reports if the move leaves the opponent with a skull match' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+      board.grid[0][3] = BrownGem.new
+      board.grid[0][4] = BlueGem.new
+      board.grid[0][5] = SkullGem.new
+      board.grid[0][6] = SkullGem.new
+
+      moves = board.moves
+
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.leaves_skull_match?).to eql(true)
+    end
+
+    it 'reports if the move leaves the oppoent with an extra turn match' do
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+      board.grid[0][3] = BrownGem.new
+      board.grid[0][4] = BlueGem.new
+
+      moves = board.moves
+
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.leaves_extra_turn?).to eql(false)
+    end
+
+    it 'reports if the move leaves the oppoent with an extra turn match' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+      board.grid[0][4] = GreenGem.new
+      board.grid[0][5] = BrownGem.new
+      board.grid[0][6] = BrownGem.new
+      board.grid[1][4] = BrownGem.new
+
+      move = board.moves.first
+
+      expect(move.leaves_extra_turn?).to eql(true)
+    end
+
+    it 'reports if the move leaves the board to be potentially jumbled' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BrownGem.new
+      board.grid[0][3] = BlueGem.new
+      board.grid[0][4] = GreenGem.new
+      board.grid[0][5] = BrownGem.new
+      board.grid[0][6] = BrownGem.new
+
+      moves = board.moves
+
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.leaves_potential_jumble?).to eql(false)
+    end
+
+    it 'reports if the move leaves the board to be potentially jumbled' do
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+      board.grid[0][3] = BrownGem.new
+      board.grid[0][4] = BlueGem.new
+
+      moves = board.moves
+
+      expect(moves.count).to eql(1)
+
+      move = moves.first
+
+      expect(move.leaves_potential_jumble?).to eql(true)
+    end
 
   end
 
@@ -211,6 +316,18 @@ describe Board do
       expect(board_resolution.mana(gem_class: BrownGem)).to eql(0)
     end
 
+    it 'tracks mana earned' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = BlueGem.new
+      board.grid[0][2] = BlueGem.new
+      board.grid[0][3] = BlueGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.mana(gem_class: BlueGem)).to eql(4)
+      expect(board_resolution.mana(gem_class: BrownGem)).to eql(0)
+    end
+
     it 'tracks half mana earned from exploding skull' do
       board.grid[0][2] = SkullGem.new
       board.grid[0][3] = ExplodingSkullGem.new
@@ -268,9 +385,80 @@ describe Board do
       expect(board_resolution.extra_turn?).to eql(true)
     end
 
-    it 'tracks skull damage done'
+    it 'tracks skull damage done' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = SkullGem.new
+      board.grid[0][2] = SkullGem.new
 
-    it 'can differentiate between skull damage and an attack'
+      board_resolution = board.resolve!
+
+      expect(board_resolution.skull_damage).to eql(0)
+    end
+
+    it 'tracks skull damage done' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = ExplodingSkullGem.new
+      board.grid[0][2] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.skull_damage).to eql(0)
+    end
+
+    it 'tracks skull damage done' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = ExplodingSkullGem.new
+      board.grid[0][2] = SkullGem.new
+      board.grid[1][0] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.skull_damage).to eql(1)
+    end
+
+    it 'tracks number of attacks' do
+      board.grid[0][0] = BlueGem.new
+      board.grid[0][1] = SkullGem.new
+      board.grid[0][2] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.attacks).to eql(0)
+    end
+
+    it 'tracks number of attacks' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = SkullGem.new
+      board.grid[0][2] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.attacks).to eql(1)
+    end
+
+    it 'tracks number of attacks' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = SkullGem.new
+      board.grid[0][2] = SkullGem.new
+      board.grid[0][4] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.attacks).to eql(1)
+    end
+
+    it 'tracks number of attacks' do
+      board.grid[0][0] = SkullGem.new
+      board.grid[0][1] = SkullGem.new
+      board.grid[0][2] = SkullGem.new
+      board.grid[1][0] = SkullGem.new
+      board.grid[1][1] = SkullGem.new
+      board.grid[1][2] = SkullGem.new
+
+      board_resolution = board.resolve!
+
+      expect(board_resolution.attacks).to eql(2)
+    end
 
   end
 

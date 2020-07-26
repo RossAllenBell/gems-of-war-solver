@@ -8,4 +8,8 @@ class SkullGem < BoardGem
     'Sk'
   end
 
+  def skull_damage
+    1
+  end
+
 end

@@ -4,4 +4,8 @@ class BrownGem < BoardGem
     'Br'
   end
 
+  def is_mana?
+    return true
+  end
+
 end

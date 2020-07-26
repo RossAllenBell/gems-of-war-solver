@@ -18,4 +18,12 @@ class BoardGem
     self.class == other.class
   end
 
+  def is_mana?
+    return false
+  end
+
+  def skull_damage
+    0
+  end
+
 end
