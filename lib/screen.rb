@@ -1,29 +1,83 @@
 class Screen
   extend Memoist
 
-  ImageMagickFuzz = 0.02
-  MeasureNthPixel = 24
-
-  GemGridDarkGray = Magick::Pixel.new(
-    78 / 255.0 * Magick::QuantumRange,
-    76 / 255.0 * Magick::QuantumRange,
-    77 / 255.0 * Magick::QuantumRange,
-    1.0,
-  )
-
-  GemGridLightGray = Magick::Pixel.new(
-    115 / 255.0 * Magick::QuantumRange,
-    102 / 255.0 * Magick::QuantumRange,
-    105 / 255.0 * Magick::QuantumRange,
-    1.0,
-  )
+  ImageMagickFuzz = 0.03
+  ImageMagickFuzzGrayDetection = 0.02
+  MeasureNthPixel = 32
+  GrayConfidence = 0.5
 
   GridLength = 8
 
-  def self.is_pixel_gem_grid_gray?(rmagick_pixel:)
-    return true if rmagick_pixel.fcmp(GemGridLightGray, Magick::QuantumRange * Screen::ImageMagickFuzz)
-    return true if rmagick_pixel.fcmp(GemGridDarkGray, Magick::QuantumRange * Screen::ImageMagickFuzz)
-    return false
+  def self.gem_grid_top_gray_pixels
+    @_gem_grid_top_gray_pixels ||= begin
+      image = Magick::ImageList.new('lib/gem_images/gem_grid_top_gray.png')
+      pixels = []
+      (0..image.columns - 1).each do |x|
+        (0..image.rows - 1).each do |y|
+          pixels << image.pixel_color(x, y)
+        end
+      end
+      pixels.uniq!
+    end
+  end
+
+  def self.gem_grid_right_gray_pixels
+    @_gem_grid_right_gray_pixels ||= begin
+      image = Magick::ImageList.new('lib/gem_images/gem_grid_right_gray.png')
+      pixels = []
+      (0..image.columns - 1).each do |x|
+        (0..image.rows - 1).each do |y|
+          pixels << image.pixel_color(x, y)
+        end
+      end
+      pixels.uniq!
+    end
+  end
+
+  def self.gem_grid_bottom_gray_pixels
+    @_gem_grid_bottom_gray_pixels ||= begin
+      image = Magick::ImageList.new('lib/gem_images/gem_grid_bottom_gray.png')
+      pixels = []
+      (0..image.columns - 1).each do |x|
+        (0..image.rows - 1).each do |y|
+          pixels << image.pixel_color(x, y)
+        end
+      end
+      pixels.uniq!
+    end
+  end
+
+  def self.gem_grid_left_gray_pixels
+    @_gem_grid_left_gray_pixels ||= begin
+      image = Magick::ImageList.new('lib/gem_images/gem_grid_left_gray.png')
+      pixels = []
+      (0..image.columns - 1).each do |x|
+        (0..image.rows - 1).each do |y|
+          pixels << image.pixel_color(x, y)
+        end
+      end
+      pixels.uniq!
+    end
+  end
+
+  def self.is_pixel_gem_grid_gray?(rmagick_pixel:, direction:)
+    return Screen.gem_grid_top_gray_pixels.any? do |pixel|
+      rmagick_pixel.fcmp(pixel, Magick::QuantumRange * Screen::ImageMagickFuzzGrayDetection)
+    end if direction == :top
+
+    return Screen.gem_grid_right_gray_pixels.any? do |pixel|
+      rmagick_pixel.fcmp(pixel, Magick::QuantumRange * Screen::ImageMagickFuzzGrayDetection)
+    end if direction == :right
+
+    return Screen.gem_grid_bottom_gray_pixels.any? do |pixel|
+      rmagick_pixel.fcmp(pixel, Magick::QuantumRange * Screen::ImageMagickFuzzGrayDetection)
+    end if direction == :bottom
+
+    return Screen.gem_grid_left_gray_pixels.any? do |pixel|
+      rmagick_pixel.fcmp(pixel, Magick::QuantumRange * Screen::ImageMagickFuzzGrayDetection)
+    end if direction == :left
+
+    fail(direction)
   end
 
   attr_accessor(
@@ -53,7 +107,7 @@ class Screen
         end
         coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
 
-        if self.are_coords_gem_grid_gray?(coords: coords)
+        if self.are_coords_gem_grid_gray?(coords: coords, direction: :top)
           break
         end
 
@@ -77,7 +131,7 @@ class Screen
         end
         coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
 
-        if self.are_coords_gem_grid_gray?(coords: coords)
+        if self.are_coords_gem_grid_gray?(coords: coords, direction: :bottom)
           break
         end
 
@@ -102,7 +156,7 @@ class Screen
         end
         coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
 
-        if self.are_coords_gem_grid_gray?(coords: coords)
+        if self.are_coords_gem_grid_gray?(coords: coords, direction: :left)
           break
         end
 
@@ -127,7 +181,7 @@ class Screen
         end
         coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
 
-        if self.are_coords_gem_grid_gray?(coords: coords)
+        if self.are_coords_gem_grid_gray?(coords: coords, direction: :right)
           break
         end
 
@@ -141,16 +195,18 @@ class Screen
   end
   memoize :gem_grid_right_x
 
-  def are_coords_gem_grid_gray?(coords:)
+  def are_coords_gem_grid_gray?(coords:, direction:)
     results = coords.map do |coord|
-      if Screen.is_pixel_gem_grid_gray?(rmagick_pixel: self.rmagick_image.pixel_color(coord.x, coord.y))
+      if Screen.is_pixel_gem_grid_gray?(rmagick_pixel: self.rmagick_image.pixel_color(coord.x, coord.y), direction: direction)
         1
       else
         0
       end
     end
 
-    return results.reduce(:+) / results.size.to_f >= 0.25
+    # puts results.reduce(:+) / results.size.to_f
+
+    return results.reduce(:+) / results.size.to_f >= Screen::GrayConfidence
   end
 
   def gem_at(x:, y:)
