@@ -5,6 +5,8 @@ describe Screen do
   let(:rmagick_image){Magick::ImageList.new(screenshot_filename)}
   let(:screen){Screen.new(rmagick_image: rmagick_image)}
 
+  it 'can take a cached set of grid boundaries'
+
   context 'using screenshot 001' do
 
     let(:screenshot_filename){'screenshots/001.png'}

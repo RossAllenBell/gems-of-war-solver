@@ -10,7 +10,11 @@ game = Game.new
 run_id = Time.now.to_i
 
 temp_file_name = "gems_of_war_solver.rb.#{run_id}.png"
+temp_file_path = "/tmp/#{temp_file_name}"
 saved_windowid = nil
+
+puts "run_id: #{run_id}"
+puts "temp_file_path: #{temp_file_path}"
 
 input = nil
 while input != 'q'
@@ -21,16 +25,16 @@ while input != 'q'
 
   if input.to_s == input.to_i.to_s
     `screencapture -o -x -l #{input} /tmp/#{temp_file_name}`
-    file_name = temp_file_name
+    file_path = temp_file_path
     saved_windowid = input
   elsif input == 'q'
     break
   else
-    file_name = input
+    file_path = input
   end
 
   begin
-    image = Magick::ImageList.new(file_name)
+    image = Magick::ImageList.new(file_path)
   rescue ArgumentError, Magick::ImageMagickError => e
     puts e.message
   end
