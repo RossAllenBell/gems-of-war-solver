@@ -1,20 +1,20 @@
 class Screen
   extend Memoist
 
-  ImageMagickFuzz = 0.025
-  MeasureNthPixel = 64
+  ImageMagickFuzz = 0.02
+  MeasureNthPixel = 24
 
   GemGridDarkGray = Magick::Pixel.new(
     78 / 255.0 * Magick::QuantumRange,
-    79 / 255.0 * Magick::QuantumRange,
-    81 / 255.0 * Magick::QuantumRange,
+    76 / 255.0 * Magick::QuantumRange,
+    77 / 255.0 * Magick::QuantumRange,
     1.0,
   )
 
   GemGridLightGray = Magick::Pixel.new(
-    113 / 255.0 * Magick::QuantumRange,
-    106 / 255.0 * Magick::QuantumRange,
-    108 / 255.0 * Magick::QuantumRange,
+    115 / 255.0 * Magick::QuantumRange,
+    102 / 255.0 * Magick::QuantumRange,
+    105 / 255.0 * Magick::QuantumRange,
     1.0,
   )
 
