@@ -15,9 +15,12 @@ while input != 'q'
   print "windowid#{" (#{saved_windowid})" unless saved_windowid.nil?}, image file, or q: "
   input = gets.strip
 
+  input = saved_windowid if input.length == 0 && saved_windowid.to_s.length > 0
+
   if input.to_s == input.to_i.to_s
     `screencapture -o -x -l #{input} /tmp/#{temp_file_name}`
     file_name = temp_file_name
+    saved_windowid = input
   elsif input == 'q'
     break
   else

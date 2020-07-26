@@ -32,6 +32,12 @@ class Game
 
     self.moves.sort.each do |move|
       puts "  #{move}"
+      puts '    extra turn' if move.extra_turn?
+      puts '    follow up extra turn' if move.follow_up_extra_turn?
+      puts '    leaves extra turn' if move.leaves_extra_turn?
+      puts '    leaves skull match' if move.leaves_skull_match?
+      puts '    potential jumble' if move.leaves_potential_jumble?
+      puts '    attack' if move.attacks > 0
     end
   end
 

@@ -1,4 +1,5 @@
 class Board
+  extend Memoist
 
   Width = 8
   Height = 8
@@ -47,6 +48,7 @@ class Board
 
     return collected_moves.uniq
   end
+  memoize :moves
 
   def test_move(swap_a:, swap_b:)
     return BoardResolution.new unless is_valid_coordinate?(coordinate: swap_a)
