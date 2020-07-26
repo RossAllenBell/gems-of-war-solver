@@ -36,6 +36,7 @@ class Move
     self_leaves_skull_match = self.leaves_skull_match? ? 1 : 0
     self_leaves_potential_jumble = self.leaves_potential_jumble? ? 1 : 0
     self_any_attacks = self.attacks > 0 ? 0 : 1
+    self_mana_gained = -1 * self.total_mana_gained
 
     other_extra_turn = other.extra_turn? ? 0 : 1
     other_leaves_extra_turn_after_extra_turn = (other.follow_up_extra_turn?) ? 0 : 1
@@ -43,6 +44,7 @@ class Move
     other_leaves_skull_match = other.leaves_skull_match? ? 1 : 0
     other_leaves_potential_jumble = other.leaves_potential_jumble? ? 1 : 0
     other_any_attacks = other.attacks > 0 ? 0 : 1
+    other_mana_gained = -1 * other.total_mana_gained
 
     return [
       self_extra_turn,
@@ -51,6 +53,8 @@ class Move
       self_leaves_skull_match,
       self_leaves_potential_jumble,
       self_any_attacks,
+      self_mana_gained,
+      self.mana_types,
       [self.swap_a, self.swap_b].sort,
     ] <=> [
       other_extra_turn,
@@ -59,6 +63,8 @@ class Move
       other_leaves_skull_match,
       other_leaves_potential_jumble,
       other_any_attacks,
+      other_mana_gained,
+      other.mana_types,
       [other.swap_a, other.swap_b].sort,
     ]
   end
@@ -81,6 +87,14 @@ class Move
 
   def mana(gem_class:)
     self.board_resolution.mana(gem_class: gem_class)
+  end
+
+  def total_mana_gained
+    self.board_resolution.total_mana_gained
+  end
+
+  def mana_types
+    self.board_resolution.mana_types
   end
 
   def leaves_skull_match?

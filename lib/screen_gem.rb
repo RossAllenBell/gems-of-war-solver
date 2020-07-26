@@ -28,7 +28,7 @@ class ScreenGem
           (0..image.rows - 1).map do |row|
             Coordinate.new(x: col, y: row)
           end
-        end.flatten(1).select.with_index{|coord, index| index % 10 == 0}
+        end.flatten(1).select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
 
         sampled_pixels = []
 
@@ -79,7 +79,7 @@ class ScreenGem
 
   def self.from_coords(rmagick_image:, coords:)
     match_counts = {}
-    coords.select.with_index{|coord, index| index % 10 == 0}.each do |coord|
+    coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}.each do |coord|
       pixel = rmagick_image.pixel_color(coord.x, coord.y)
       ScreenGem::Colors::All.each do |color|
         any_match = ScreenGem.colors_to_pixel_sets[color].any? do |color_pixel|

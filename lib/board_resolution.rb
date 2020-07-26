@@ -36,6 +36,18 @@ class BoardResolution
     self.mana_earned[gem_class].to_i
   end
 
+  def total_mana_gained
+    self.mana_earned.to_a.select do |gem_class, raw_mana|
+      gem_class.new.is_mana?
+    end.map(&:last).map(&:to_i).sum
+  end
+
+  def mana_types
+    self.mana_earned.to_a.select do |gem_class, raw_mana|
+      gem_class.new.is_mana? && raw_mana >= 1
+    end.map(&:first).map(&:name)
+  end
+
   def extra_turn!
     self.extra_turn = true
   end

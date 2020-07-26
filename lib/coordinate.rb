@@ -23,7 +23,15 @@ class Coordinate
   end
 
   def <=>(other)
-    return [self.x, self.y] <=> [other.x, other.y]
+    return [
+      self.y,
+      -1 * ((Board::Width / 2) - self.x).abs,
+      -1 * ((Board::Width / 2 - 1) - self.x).abs,
+    ] <=> [
+      other.y,
+      -1 * ((Board::Width / 2) - other.x).abs,
+      -1 * ((Board::Width / 2 - 1) - other.x).abs,
+    ]
   end
 
   def hash

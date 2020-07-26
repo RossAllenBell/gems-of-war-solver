@@ -2,6 +2,7 @@ class Screen
   extend Memoist
 
   ImageMagickFuzz = 0.025
+  MeasureNthPixel = 64
 
   GemGridDarkGray = Magick::Pixel.new(
     78 / 255.0 * Magick::QuantumRange,
@@ -27,101 +28,116 @@ class Screen
 
   attr_accessor(
     :rmagick_image,
+    :cached_gem_grid_top_y,
+    :cached_gem_grid_right_x,
+    :cached_gem_grid_bottom_y,
+    :cached_gem_grid_left_x,
   )
 
-  def initialize(rmagick_image:)
+  def initialize(rmagick_image:, cached_gem_grid_top_y: nil, cached_gem_grid_right_x: nil, cached_gem_grid_bottom_y: nil, cached_gem_grid_left_x: nil)
     self.rmagick_image = rmagick_image
+    self.cached_gem_grid_top_y = cached_gem_grid_top_y
+    self.cached_gem_grid_right_x = cached_gem_grid_right_x
+    self.cached_gem_grid_bottom_y = cached_gem_grid_bottom_y
+    self.cached_gem_grid_left_x = cached_gem_grid_left_x
   end
 
   def gem_grid_top_y
-    print 'gem_grid_top_y: ' if Game.debug?
+    self.cached_gem_grid_top_y ||= begin
+      print 'gem_grid_top_y: ' if Game.debug?
 
-    row = 0
-    while row < self.rmagick_image.rows
-      coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
-        Coordinate.new(x: x, y: row)
+      row = 0
+      while row < self.rmagick_image.rows
+        coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
+          Coordinate.new(x: x, y: row)
+        end
+        coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
+
+        if self.are_coords_gem_grid_gray?(coords: coords)
+          break
+        end
+
+        row += 1
       end
-      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
-      if self.are_coords_gem_grid_gray?(coords: coords)
-        break
-      end
+      puts row if Game.debug?
 
-      row += 1
+      row
     end
-
-    puts row if Game.debug?
-
-    row
   end
-  memoize :gem_grid_top_y
 
   def gem_grid_bottom_y
-    print 'gem_grid_bottom_y: ' if Game.debug?
+    self.cached_gem_grid_bottom_y ||= begin
+      print 'gem_grid_bottom_y: ' if Game.debug?
 
-    row = self.rmagick_image.rows - 1
-    while row >= 0
-      coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
-        Coordinate.new(x: x, y: row)
+      row = self.rmagick_image.rows - 1
+      while row >= 0
+        coords = (gem_grid_left_x..gem_grid_right_x).map do |x|
+          Coordinate.new(x: x, y: row)
+        end
+        coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
+
+        if self.are_coords_gem_grid_gray?(coords: coords)
+          break
+        end
+
+        row -= 1
       end
-      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
-      if self.are_coords_gem_grid_gray?(coords: coords)
-        break
-      end
+      puts row if Game.debug?
 
-      row -= 1
+      row
     end
-
-    puts row if Game.debug?
-
-    row
   end
   memoize :gem_grid_bottom_y
 
   def gem_grid_left_x
-    print 'gem_grid_left_x: ' if Game.debug?
+    self.cached_gem_grid_left_x ||= begin
+      print 'gem_grid_left_x: ' if Game.debug?
 
-    col = 0
-    while col < self.rmagick_image.columns
-      coords = (0..self.rmagick_image.rows - 1).map do |y|
-        Coordinate.new(x: col, y: y)
+      col = 0
+      while col < self.rmagick_image.columns
+        coords = (0..self.rmagick_image.rows - 1).map do |y|
+          Coordinate.new(x: col, y: y)
+        end
+        coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
+
+        if self.are_coords_gem_grid_gray?(coords: coords)
+          break
+        end
+
+        col += 1
       end
-      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
-      if self.are_coords_gem_grid_gray?(coords: coords)
-        break
-      end
+      puts col if Game.debug?
 
-      col += 1
+      col
     end
-
-    puts col if Game.debug?
-
-    col
   end
   memoize :gem_grid_left_x
 
   def gem_grid_right_x
-    print 'gem_grid_right_x: ' if Game.debug?
+    self.cached_gem_grid_right_x ||= begin
+      print 'gem_grid_right_x: ' if Game.debug?
 
-    col = self.rmagick_image.columns - 1
-    while col >= 0
-      coords = (0..self.rmagick_image.rows - 1).map do |y|
-        Coordinate.new(x: col, y: y)
+      col = self.rmagick_image.columns - 1
+      while col >= 0
+        coords = (0..self.rmagick_image.rows - 1).map do |y|
+          Coordinate.new(x: col, y: y)
+        end
+        coords = coords.select.with_index{|coord, index| index % Screen::MeasureNthPixel == 0}
+
+        if self.are_coords_gem_grid_gray?(coords: coords)
+          break
+        end
+
+        col -= 1
       end
-      coords = coords.select.with_index{|coord, index| index % 10 == 0}
 
-      if self.are_coords_gem_grid_gray?(coords: coords)
-        break
-      end
+      puts col if Game.debug?
 
-      col -= 1
+      col
     end
-
-    puts col if Game.debug?
-
-    col
   end
   memoize :gem_grid_right_x
 

@@ -42,8 +42,7 @@ while input != 'q'
   puts ''
 
   if !image.nil?
-    screen = Screen.new(rmagick_image: image)
-    game.update(screen: screen)
+    game.update(image: image)
 
     puts '' if Game.debug?
 

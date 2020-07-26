@@ -4,19 +4,38 @@ class Game
 
   attr_accessor(
     :board,
+    :cached_gem_grid_top_y,
+    :cached_gem_grid_right_x,
+    :cached_gem_grid_bottom_y,
+    :cached_gem_grid_left_x,
   )
 
   def initialize(board: nil)
     self.board = board
   end
 
-  def update(screen:)
+  def update(image:)
+    screen = Screen.new(
+      rmagick_image: image,
+      cached_gem_grid_top_y: cached_gem_grid_top_y,
+      cached_gem_grid_right_x: cached_gem_grid_right_x,
+      cached_gem_grid_bottom_y: cached_gem_grid_bottom_y,
+      cached_gem_grid_left_x: cached_gem_grid_left_x,
+    )
+
+    puts 'using cached gem grid boundaries' if !self.cached_gem_grid_top_y.nil? && Game.debug?
+
     self.board = Board.new
     (0..Board::Width - 1).each do |x|
       (0..Board::Height - 1).each do |y|
         self.board.grid[x][y] = screen.gem_at(x: x, y: y).board_gem
       end
     end
+
+    self.cached_gem_grid_top_y = screen.gem_grid_top_y
+    self.cached_gem_grid_right_x = screen.gem_grid_right_x
+    self.cached_gem_grid_bottom_y = screen.gem_grid_bottom_y
+    self.cached_gem_grid_left_x = screen.gem_grid_left_x
   end
 
   def moves
@@ -37,7 +56,7 @@ class Game
       puts '    leaves extra turn' if move.leaves_extra_turn? && !move.extra_turn?
       puts '    leaves skull match' if move.leaves_skull_match? && !move.extra_turn?
       puts '    potential jumble' if move.leaves_potential_jumble?
-      puts '    attack' if move.attacks > 0
+      puts "    attacks: #{move.attacks}" if move.attacks > 0
     end
   end
 

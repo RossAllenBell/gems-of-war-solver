@@ -1,6 +1,0 @@
-implement outstanding unit tests
-specify number of attacks a move will execute
-specify number of attacks a remaining move could execute
-use grid boarder boundary caching
-try reducing pixels sampled on gem identification
-ensure grid boundary is only checking sampled coords?
