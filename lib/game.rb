@@ -1,6 +1,6 @@
 class Game
 
-  Debug = false
+  @debug = false
 
   attr_accessor(
     :board,
@@ -34,11 +34,19 @@ class Game
       puts "  #{move}"
       puts '    extra turn' if move.extra_turn?
       puts '    follow up extra turn' if move.follow_up_extra_turn?
-      puts '    leaves extra turn' if move.leaves_extra_turn?
-      puts '    leaves skull match' if move.leaves_skull_match?
+      puts '    leaves extra turn' if move.leaves_extra_turn? && !move.extra_turn?
+      puts '    leaves skull match' if move.leaves_skull_match? && !move.extra_turn?
       puts '    potential jumble' if move.leaves_potential_jumble?
       puts '    attack' if move.attacks > 0
     end
+  end
+
+  def self.set_debug(value)
+    @debug = value
+  end
+
+  def self.debug?
+    return @debug
   end
 
 end

@@ -4,6 +4,8 @@ require 'byebug'
 
 Dir[__dir__ + '/lib/**/*.rb'].each &method(:require)
 
+Game.set_debug(true)
+
 game = Game.new
 run_id = Time.now.to_i
 
@@ -39,7 +41,7 @@ while input != 'q'
     screen = Screen.new(rmagick_image: image)
     game.update(screen: screen)
 
-    puts '' if Game::Debug
+    puts '' if Game.debug?
 
     game.print_state
 

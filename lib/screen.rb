@@ -34,7 +34,7 @@ class Screen
   end
 
   def gem_grid_top_y
-    print 'gem_grid_top_y: ' if Game::Debug
+    print 'gem_grid_top_y: ' if Game.debug?
 
     row = 0
     while row < self.rmagick_image.rows
@@ -50,14 +50,14 @@ class Screen
       row += 1
     end
 
-    puts row if Game::Debug
+    puts row if Game.debug?
 
     row
   end
   memoize :gem_grid_top_y
 
   def gem_grid_bottom_y
-    print 'gem_grid_bottom_y: ' if Game::Debug
+    print 'gem_grid_bottom_y: ' if Game.debug?
 
     row = self.rmagick_image.rows - 1
     while row >= 0
@@ -73,14 +73,14 @@ class Screen
       row -= 1
     end
 
-    puts row if Game::Debug
+    puts row if Game.debug?
 
     row
   end
   memoize :gem_grid_bottom_y
 
   def gem_grid_left_x
-    print 'gem_grid_left_x: ' if Game::Debug
+    print 'gem_grid_left_x: ' if Game.debug?
 
     col = 0
     while col < self.rmagick_image.columns
@@ -96,14 +96,14 @@ class Screen
       col += 1
     end
 
-    puts col if Game::Debug
+    puts col if Game.debug?
 
     col
   end
   memoize :gem_grid_left_x
 
   def gem_grid_right_x
-    print 'gem_grid_right_x: ' if Game::Debug
+    print 'gem_grid_right_x: ' if Game.debug?
 
     col = self.rmagick_image.columns - 1
     while col >= 0
@@ -119,7 +119,7 @@ class Screen
       col -= 1
     end
 
-    puts col if Game::Debug
+    puts col if Game.debug?
 
     col
   end
