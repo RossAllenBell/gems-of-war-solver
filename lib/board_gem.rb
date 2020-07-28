@@ -1,5 +1,11 @@
 class BoardGem
 
+  def self.from_code(code:)
+    ObjectSpace.each_object(Class).select { |klass| klass < self }.detect do |klass|
+      klass.new.string_code == code
+    end.new
+  end
+
   def dup
     return self.class.new
   end

@@ -12,6 +12,21 @@ class Board
     self.grid = grid || (0..Board::Width - 1).map{[nil] * Board::Height}
   end
 
+  def self.from_string_codes(string)
+    codes = string.split(/[^A-Za-z]+/).compact
+    gems = codes.map do |code|
+      BoardGem.from_code(code: code)
+    end
+    grid = []
+    (0..Board::Height - 1).each do |y|
+      (0..Board::Width - 1).each do |x|
+        grid[x] ||= []
+        grid[x] << gems.shift
+      end
+    end
+    return Board.new(grid: grid)
+  end
+
   def dup
     new_board = Board.new
 

@@ -178,6 +178,30 @@ describe Board do
       expect(move.leaves_potential_jumble?).to eql(true)
     end
 
+    it 'regression test' do
+      board = Board.from_string_codes(
+        <<~codes
+          Gr, Sk, Pu, Gr, Bl, Sk, Br, Sk
+          Bl, Br, Re, Sk, Ye, Gr, Pu, Bl
+          Bl, Re, Br, Sk, Bl, Re, ES, Ye
+          Br, Sk, Gr, Re, Re, Sk, Br, Gr
+          Sk, Gr, Ye, Re, Sk, Gr, Bl, Re
+          Br, Pu, Gr, Pu, Gr, Pu, ES, Bl
+          Gr, Sk, Sk, Gr, Re, Ye, Re, Br
+          Bl, Pu, Re, Ye, Br, Re, Gr, Sk
+        codes
+      )
+
+      moves = board.moves
+
+      move_3_4_to_3_5 = moves.detect do |move|
+        [move.swap_a, move.swap_b].sort == [Coordinate.new(x: 3, y: 5), Coordinate.new(x: 3, y: 6)].sort
+      end
+
+      expect(move_3_4_to_3_5).to be
+      expect(move_3_4_to_3_5.leaves_skull_match?).to eql(true) # from a chain reaction
+    end
+
   end
 
   describe :resolve! do
